@@ -16,9 +16,9 @@ providing:
 Depending on your package manager:
 
 ```sh
-deno add jsr:@f-stack/typed-url-pattern
-pnpm i jsr:@f-stack/typed-url-pattern
-npx jsr add @f-stack/typed-url-pattern
+deno add jsr:@fcrozatier/typed-url-pattern
+pnpm i jsr:@fcrozatier/typed-url-pattern
+npx jsr add @fcrozatier/typed-url-pattern
 ```
 
 ## Common patterns
@@ -26,7 +26,7 @@ npx jsr add @f-stack/typed-url-pattern
 - **Typed named parameters**
 
 ```ts
-import { TypedURLPattern } from "@f-stack/typed-url-pattern";
+import { TypedURLPattern } from "@fcrozatier/typed-url-pattern";
 import * as z from "zod";
 
 const route = new TypedURLPattern(
@@ -44,7 +44,7 @@ match?.params.name === "bob";
 Unnamed groups can be typed, parsed and validated in the order they appear
 
 ```ts
-import { TypedURLPattern } from "@f-stack/typed-url-pattern";
+import { TypedURLPattern } from "@fcrozatier/typed-url-pattern";
 import * as z from "zod";
 
 const route = new TypedURLPattern(
@@ -65,7 +65,7 @@ schema. This is useful when you don't control links to your page _eg_ search
 engines adding `utm` searchParams etc.
 
 ```ts
-import { TypedURLPattern } from "@f-stack/typed-url-pattern";
+import { TypedURLPattern } from "@fcrozatier/typed-url-pattern";
 import * as z from "zod";
 
 const route = new TypedURLPattern(
@@ -86,7 +86,7 @@ match?.searchParams.utm === "utm_source";
 Coerce strings extracted by `URLPattern` to numbers, booleans etc
 
 ```ts
-import { TypedURLPattern } from "@f-stack/typed-url-pattern";
+import { TypedURLPattern } from "@fcrozatier/typed-url-pattern";
 import * as z from "zod";
 
 const route = new TypedURLPattern(
@@ -108,7 +108,7 @@ This allows to avoid the "relative URL without a base" `TypeError` common with
 `URLPattern`
 
 ```ts
-import { TypedURLPattern } from "@f-stack/typed-url-pattern";
+import { TypedURLPattern } from "@fcrozatier/typed-url-pattern";
 
 // once
 TypedURLPattern.baseURL = "https://example.com";
@@ -130,7 +130,7 @@ The following demo showcases:
 - typed optional searchParams
 
 ```ts
-import { TypedURLPattern } from "@f-stack/typed-url-pattern";
+import { TypedURLPattern } from "@fcrozatier/typed-url-pattern";
 import * as z from "zod";
 
 const route = new TypedURLPattern(
@@ -162,4 +162,4 @@ const href2 = route.href({
 href2 === "https://example.com/42-mycake?page=2";
 ```
 
-## [API](https://jsr.io/@f-stack/typed-url-pattern/doc)
+## [API](https://jsr.io/@fcrozatier/typed-url-pattern/doc)

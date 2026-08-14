@@ -5,7 +5,7 @@ import {
   unreachable,
 } from "@std/assert";
 import * as z from "zod";
-import { TypedURLPattern } from "@f-stack/typed-url-pattern";
+import { TypedURLPattern } from "./typedURLPattern.ts";
 
 const BASE_URL = "https://example.com";
 
