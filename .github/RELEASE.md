@@ -14,4 +14,4 @@ To cut a release, follow these steps:
 
 3. Create a release from GitHub
 
-5. Wait for the workspace publish action to publish the new versions to JSR.
+4. Wait for the workspace publish action to publish the new versions to JSR.
