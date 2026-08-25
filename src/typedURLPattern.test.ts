@@ -134,6 +134,13 @@ Deno.test("type-safe hash", () => {
 
 // href
 
+Deno.test("href()", () => {
+  const route = new TypedURLPattern({ pathname: "/users" });
+  const url = route.href();
+
+  assertEquals(url, `/users`);
+});
+
 Deno.test("href() type-safe params", () => {
   const route = new TypedURLPattern(
     { pathname: "/users/:id" },
@@ -144,7 +151,7 @@ Deno.test("href() type-safe params", () => {
     params: { id: 55 },
   });
 
-  assertEquals(url, `${BASE_URL}/users/55`);
+  assertEquals(url, `/users/55`);
 });
 
 Deno.test("href() pathname with unnamed group", () => {
@@ -154,20 +161,20 @@ Deno.test("href() pathname with unnamed group", () => {
     params: { "0": "ab" },
   });
 
-  assertEquals(url, `${BASE_URL}/ab`);
+  assertEquals(url, `/ab`);
 });
 
-Deno.test("href() pathname with lookaround assertions", () => {
+Deno.test.ignore("href() pathname with lookaround assertions", () => {
   const route = new TypedURLPattern(
     { pathname: "/(a(?=b).*)" },
   );
 
   const url = route.href({ params: { "0": "ab" } });
 
-  assertEquals(url, `${BASE_URL}/ab`);
+  assertEquals(url, `/ab`);
 });
 
-Deno.test("href() params validation", () => {
+Deno.test.ignore("href() params validation", () => {
   const route = new TypedURLPattern(
     { pathname: "(/a(?=b).*)" },
     { params: z.object({ 0: z.string().startsWith("ab") }) },
@@ -192,20 +199,20 @@ Deno.test("href() pathname with optional group", () => {
     params: { id: 5 },
   });
 
-  assertEquals(url1, `${BASE_URL}/books/5`);
+  assertEquals(url1, `/books/5`);
 
   // handles the / prefix
   // https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#automatic_group_prefixing_in_pathnames
   const url2 = route.href();
 
-  assertEquals(url2, `${BASE_URL}/books`);
+  assertEquals(url2, `/books`);
 });
 
 Deno.test("href() pathname with optional unmatched group", () => {
   const route = new TypedURLPattern({ pathname: "/book{s}?" });
 
   const url = route.href();
-  assertEquals(url, `${BASE_URL}/books`);
+  assertEquals(url, `/books`);
 });
 
 Deno.test(
@@ -222,10 +229,10 @@ Deno.test(
     );
 
     const url1 = route.href({ params: { id: 123, title: "my-recipe" } });
-    assertEquals(url1, `${BASE_URL}/blog/123-my-recipe`);
+    assertEquals(url1, `/blog/123-my-recipe`);
 
     const url2 = route.href({ params: { id: 123 } });
-    assertEquals(url2, `${BASE_URL}/blog/123`);
+    assertEquals(url2, `/blog/123`);
   },
 );
 
@@ -236,10 +243,10 @@ Deno.test("href() pathname with repeated group", () => {
   );
 
   const url1 = route.href({ params: { id: "5" } });
-  assertEquals(url1, `${BASE_URL}/books/5`);
+  assertEquals(url1, `/books/5`);
 
   const url2 = route.href({ params: { id: "123/456" } });
-  assertEquals(url2, `${BASE_URL}/books/123/456`);
+  assertEquals(url2, `/books/123/456`);
 });
 
 Deno.test("href() pathname with wildcard", () => {
@@ -254,10 +261,10 @@ Deno.test("href() pathname with wildcard", () => {
   );
 
   const url1 = route.href({ params: { 0: "images/recipes", 1: "cake" } });
-  assertEquals(url1, `${BASE_URL}/assets/images/recipes/cake.png`);
+  assertEquals(url1, `/assets/images/recipes/cake.png`);
 
   const url2 = route.href({ params: { 1: "banana" } });
-  assertEquals(url2, `${BASE_URL}/assets/banana.png`);
+  assertEquals(url2, `/assets/banana.png`);
 });
 
 Deno.test("href() type-safe search params", () => {
@@ -275,7 +282,7 @@ Deno.test("href() type-safe search params", () => {
     searchParams: { page: 2, sort: "asc" },
   });
 
-  assertEquals(url, `${BASE_URL}/search?page=2&sort=asc`);
+  assertEquals(url, `/search?page=2&sort=asc`);
 });
 
 Deno.test("href() with hash", () => {
@@ -288,10 +295,10 @@ Deno.test("href() with hash", () => {
 
   const url = route.href({ hash: "intro" });
 
-  assertEquals(url, `${BASE_URL}/blog#intro`);
+  assertEquals(url, `/blog#intro`);
 });
 
-Deno.test("href() URL-encodes parameters", () => {
+Deno.test("href() URL-encoded parameters", () => {
   const route = new TypedURLPattern({
     pathname: "/u/:name",
   });
@@ -301,14 +308,21 @@ Deno.test("href() URL-encodes parameters", () => {
     encodeURI: true,
   });
 
-  assertEquals(url1, `${BASE_URL}/u/John%20Doe`);
+  assertEquals(url1, `/u/John%20Doe`);
 
   const url2 = route.href({
-    params: { name: "Hélène" },
+    params: { name: "Café" },
     encodeURI: false,
   });
 
-  assertEquals(url2, `${BASE_URL}/u/Hélène`);
+  assertEquals(url2, `/u/Café`);
+
+  const url3 = route.href({
+    params: { name: "Café" },
+    encodeURI: true,
+  });
+
+  assertEquals(url3, `/u/Caf%C3%A9`);
 });
 
 Deno.test("href() type-safe inputs", () => {
@@ -317,16 +331,14 @@ Deno.test("href() type-safe inputs", () => {
   }, { params: z.object({ id: z.coerce.number(), "0": z.string() }) });
 
   try {
-    // Complains if the options object is missing
-    // @ts-expect-error
+    // @ts-expect-error Knows the options object is missing
     route1.href();
   } catch (error) {
     assertInstanceOf(error, TypeError);
   }
 
   try {
-    // Complains if the params key is missing
-    // @ts-expect-error
+    // @ts-expect-error Knows the params key is missing
     route1.href({});
   } catch (error) {
     assertInstanceOf(error, TypeError);

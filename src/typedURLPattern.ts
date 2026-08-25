@@ -277,14 +277,7 @@ export class TypedURLPattern<
             StandardSchemaV1.InferInput<V> & string,
             unknown extends StandardSchemaV1.InferInput<V> ? true : false
           >
-          & {
-            /**
-             * Whether to use `encodeURI` before returning the href
-             *
-             * @default false
-             */
-            encodeURI?: boolean;
-          }
+          & HrefOptions
         >,
       ]
       : [
@@ -307,23 +300,18 @@ export class TypedURLPattern<
             unknown extends StandardSchemaV1.InferInput<V> ? true
               : AreAllKeysOptional<StandardSchemaV1.InferInput<V>>
           >
-          & {
-            /**
-             * Whether to use `encodeURI` before returning the href
-             *
-             * @default false
-             */
-            encodeURI?: boolean;
-          }
+          & HrefOptions
         >,
       ]
   ): string {
-    const { params, searchParams, hash } = (args[0] ?? {}) as {
-      params?: StandardSchemaV1.InferInput<T>;
-      searchParams?: StandardSchemaV1.InferInput<U>;
-      hash?: StandardSchemaV1.InferInput<V> & string;
-      encodeURI?: boolean;
-    };
+    const { params, searchParams, hash, encodeURI: encode, absolute = false } =
+      (args[0] ?? {}) as
+        & {
+          params?: StandardSchemaV1.InferInput<T>;
+          searchParams?: StandardSchemaV1.InferInput<U>;
+          hash?: StandardSchemaV1.InferInput<V> & string;
+        }
+        & HrefOptions;
     const pattern = this.pattern;
 
     let baseURL = this.baseURL;
@@ -441,13 +429,28 @@ export class TypedURLPattern<
     }
 
     const _hash = typeof hash === "string" ? "#" + hash : "";
-    const href = baseURL + pathname + search + _hash;
-    const uri = args[0]?.encodeURI ? encodeURI(href) : href;
+    const href = (absolute ? baseURL : "") + pathname + search + _hash;
+    const uri = encode ? encodeURI(href) : href;
 
-    if (!pattern.exec(uri)) {
+    if (!pattern.exec(absolute ? uri : baseURL + uri)) {
       throw new TypeError("[TypedURLPattern]: href doesn't match the pattern");
     }
 
     return uri;
   }
 }
+
+type HrefOptions = {
+  /**
+   * Whether to use `encodeURI` before returning the href
+   *
+   * @default false
+   */
+  encodeURI?: boolean;
+  /**
+   * Whether the returned URL is absolute or relative
+   *
+   * @default false
+   */
+  absolute?: boolean;
+};
