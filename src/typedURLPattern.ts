@@ -440,7 +440,10 @@ export class TypedURLPattern<
   }
 }
 
-type HrefOptions = {
+/**
+ * {@link TypedURLPattern.href | href} options
+ */
+export type HrefOptions = {
   /**
    * Whether to use `encodeURI` before returning the href
    *

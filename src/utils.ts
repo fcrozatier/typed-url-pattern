@@ -1,4 +1,5 @@
 /** @internal */
+// deno-lint-ignore ban-types
 export type Pretty<T> = { [K in keyof T]: T[K] } & {};
 
 // deno-fmt-ignore
@@ -12,6 +13,7 @@ type FilterRequiredKeys<T> = {
 };
 
 /** @internal */
+// deno-lint-ignore ban-types
 export type AreAllKeysOptional<T> = {} extends FilterRequiredKeys<T> ? true
   : false;
 

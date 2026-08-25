@@ -2,6 +2,9 @@
   "name": "@fcrozatier/typed-url-pattern",
   "version": "0.1.0",
   "license": "MIT",
+  "tasks": {
+    "check:all": "deno fmt --check && deno lint && deno check && deno test -A && deno test -A --doc && deno doc --lint src/typedURLPattern.ts"
+  },
   "exports": {
     ".": "./src/typedURLPattern.ts"
   },
