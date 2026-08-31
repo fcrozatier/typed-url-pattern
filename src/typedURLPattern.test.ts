@@ -285,6 +285,13 @@ Deno.test("href() type-safe search params", () => {
   assertEquals(url, `/search?page=2&sort=asc`);
 });
 
+Deno.test("href() empty search params", () => {
+  const route = new TypedURLPattern({ pathname: "/", search: "?newsletter" });
+  const url = route.href();
+
+  assertEquals(url, `/?newsletter`);
+});
+
 Deno.test("href() with hash", () => {
   const route = new TypedURLPattern({
     pathname: "/blog",
