@@ -410,9 +410,17 @@ export class TypedURLPattern<
     });
 
     let search = "";
+    const searchParamsMap = new Map();
+
+    if (this.pattern.search !== "*") {
+      // Find constant & empty search params
+      const searchParams = new URLSearchParams(this.pattern.search);
+      for (const [key, value] of searchParams.entries()) {
+        searchParamsMap.set(key, value);
+      }
+    }
 
     if (searchParams) {
-      const entries: string[] = [];
       for (const [key, value] of Object.entries(searchParams)) {
         assert(
           typeof value === "string" ||
@@ -420,12 +428,14 @@ export class TypedURLPattern<
             typeof value === "boolean",
           "SearchParams must be strings, numbers or booleans",
         );
-        entries.push(`${key}=${value}`);
+        searchParamsMap.set(key, value);
       }
+    }
 
-      if (entries.length) {
-        search = `?${entries.join("&")}`;
-      }
+    if (searchParamsMap.size > 0) {
+      search = "?" + [...searchParamsMap.entries()]
+        .map(([key, value]) => value ? `${key}=${value}` : key)
+        .join("&");
     }
 
     const _hash = typeof hash === "string" ? "#" + hash : "";
