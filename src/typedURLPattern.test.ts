@@ -141,6 +141,13 @@ Deno.test("href()", () => {
   assertEquals(url, `/users`);
 });
 
+Deno.test("href() custom base", () => {
+  const route = new TypedURLPattern({ pathname: "/users" });
+  const url = route.href({ baseURL: "https://example.com" });
+
+  assertEquals(url, `https://example.com/users`);
+});
+
 Deno.test("href() type-safe params", () => {
   const route = new TypedURLPattern(
     { pathname: "/users/:id" },
