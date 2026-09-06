@@ -304,7 +304,7 @@ export class TypedURLPattern<
         >,
       ]
   ): string {
-    const { params, searchParams, hash, encodeURI: encode, absolute = false } =
+    const { params, searchParams, hash, encodeURI: encode, baseURL = false } =
       (args[0] ?? {}) as
         & {
           params?: StandardSchemaV1.InferInput<T>;
@@ -313,17 +313,16 @@ export class TypedURLPattern<
         }
         & HrefOptions;
     const pattern = this.pattern;
+    const absolute = Boolean(baseURL);
+    let base = absolute && typeof baseURL === "string" ? baseURL : this.baseURL;
 
-    let baseURL = this.baseURL;
-
-    // `baseURL` can be an empty string here
-    if (!baseURL) {
+    // `base` can be an empty string here
+    if (!base) {
       const protocol = pattern.protocol;
       const hostname = pattern.hostname;
       const port = pattern.port ? ":" + pattern.port : "";
 
-      baseURL = protocol + "://" + hostname + port;
-      this.baseURL = baseURL;
+      base = protocol + "://" + hostname + port;
     }
 
     let pathname = pattern.pathname;
@@ -439,10 +438,10 @@ export class TypedURLPattern<
     }
 
     const _hash = typeof hash === "string" ? "#" + hash : "";
-    const href = (absolute ? baseURL : "") + pathname + search + _hash;
+    const href = (absolute ? base : "") + pathname + search + _hash;
     const uri = encode ? encodeURI(href) : href;
 
-    if (!pattern.exec(absolute ? uri : baseURL + uri)) {
+    if (!pattern.exec(absolute ? uri : base + uri)) {
       throw new TypeError("[TypedURLPattern]: href doesn't match the pattern");
     }
 
@@ -461,9 +460,11 @@ export type HrefOptions = {
    */
   encodeURI?: boolean;
   /**
-   * Whether the returned URL is absolute or relative
+   * Whether the returned URL is absolute or relative.
+   *
+   * If a string is provided it will override the {@linkcode TypedURLPattern.baseURL} static property
    *
    * @default false
    */
-  absolute?: boolean;
+  baseURL?: boolean | string;
 };
