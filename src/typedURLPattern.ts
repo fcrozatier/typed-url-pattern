@@ -441,10 +441,6 @@ export class TypedURLPattern<
     const href = (absolute ? base : "") + pathname + search + _hash;
     const uri = encode ? encodeURI(href) : href;
 
-    if (!pattern.exec(absolute ? uri : base + uri)) {
-      throw new TypeError("[TypedURLPattern]: href doesn't match the pattern");
-    }
-
     return uri;
   }
 }
