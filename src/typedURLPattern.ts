@@ -304,14 +304,19 @@ export class TypedURLPattern<
         >,
       ]
   ): string {
-    const { params, searchParams, hash, encodeURI: encode, baseURL = false } =
-      (args[0] ?? {}) as
-        & {
-          params?: StandardSchemaV1.InferInput<T>;
-          searchParams?: StandardSchemaV1.InferInput<U>;
-          hash?: StandardSchemaV1.InferInput<V> & string;
-        }
-        & HrefOptions;
+    const {
+      params,
+      searchParams,
+      hash,
+      encodeURI: encode = false,
+      baseURL = false,
+    } = (args[0] ?? {}) as
+      & {
+        params?: StandardSchemaV1.InferInput<T>;
+        searchParams?: StandardSchemaV1.InferInput<U>;
+        hash?: StandardSchemaV1.InferInput<V> & string;
+      }
+      & HrefOptions;
     const pattern = this.pattern;
     const absolute = Boolean(baseURL);
     let base = absolute && typeof baseURL === "string" ? baseURL : this.baseURL;
@@ -367,7 +372,7 @@ export class TypedURLPattern<
           // also remove optional regex as in :id(\\d+)
           pathname = pathname.replace(
             new RegExp(":" + key + "([(][^\)]+[\)])?[?+*]?"),
-            String(value),
+            String(encode ? encodeURIComponent(value) : value),
           );
         } else {
           // unnamed groups
@@ -427,7 +432,10 @@ export class TypedURLPattern<
             typeof value === "boolean",
           "SearchParams must be strings, numbers or booleans",
         );
-        searchParamsMap.set(key, value);
+        searchParamsMap.set(
+          encode ? encodeURIComponent(key) : key,
+          encode ? encodeURIComponent(value) : value,
+        );
       }
     }
 
@@ -439,7 +447,7 @@ export class TypedURLPattern<
 
     const _hash = typeof hash === "string" ? "#" + hash : "";
     const href = (absolute ? base : "") + pathname + search + _hash;
-    const uri = encode ? encodeURI(href) : href;
+    const uri = encode ? href : decodeURI(href);
 
     return uri;
   }

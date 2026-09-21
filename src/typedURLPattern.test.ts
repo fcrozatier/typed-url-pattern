@@ -312,31 +312,40 @@ Deno.test("href() with hash", () => {
   assertEquals(url, `/blog#intro`);
 });
 
-Deno.test("href() URL-encoded parameters", () => {
+Deno.test("href() URL-encoded params", () => {
   const route = new TypedURLPattern({
     pathname: "/u/:name",
   });
 
   const url1 = route.href({
-    params: { name: "John Doe" },
-    encodeURI: true,
-  });
-
-  assertEquals(url1, `/u/John%20Doe`);
-
-  const url2 = route.href({
     params: { name: "Café" },
+    searchParams: { top: "crème" },
     encodeURI: false,
   });
 
-  assertEquals(url2, `/u/Café`);
+  assertEquals(url1, `/u/Café?top=crème`);
 
-  const url3 = route.href({
+  const url2 = route.href({
     params: { name: "Café" },
+    searchParams: { top: "crème" },
     encodeURI: true,
   });
 
-  assertEquals(url3, `/u/Caf%C3%A9`);
+  assertEquals(url2, `/u/Caf%C3%A9?top=cr%C3%A8me`);
+});
+
+Deno.test("href() URL-encoded pathname ", () => {
+  const route = new TypedURLPattern({
+    pathname: "/café",
+  });
+
+  const url1 = route.href();
+
+  assertEquals(url1, `/café`);
+
+  const url2 = route.href({ encodeURI: true });
+
+  assertEquals(url2, `/caf%C3%A9`);
 });
 
 Deno.test("href() type-safe inputs", () => {
